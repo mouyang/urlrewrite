@@ -129,14 +129,19 @@ public class VariableReplacer implements SubstitutionFilter {
      */
     private static String varReplace(String originalVarStr, HttpServletRequest hsRequest) {
         // get the sub name if any ie for headers etc header:user-agent
+        String defaultValue = null;
         String varSubName = null;
         String varType;
-        int colonIdx = originalVarStr.indexOf(":");
-        if (colonIdx != -1 && colonIdx + 1 < originalVarStr.length()) {
-            varSubName = originalVarStr.substring(colonIdx + 1);
-            varType = originalVarStr.substring(0, colonIdx);
+        String[] split = originalVarStr.split(":");
+        if (2 <= split.length) {
+            if (3 == split.length) {
+                defaultValue = split[2];
+            }
+            varSubName = split[1];
+            varType = split[0];
             if (log.isDebugEnabled()) log.debug("variable %{" + originalVarStr + "} type: " + varType +
-                    ", name: '" + varSubName + "'");
+                    ", name: '" + varSubName + "'" + 
+                    ((null != defaultValue) ? (", defaultValue: '" + defaultValue + "'") : null));
         } else {
             varType = originalVarStr;
             if (log.isDebugEnabled()) log.debug("variable %{" + originalVarStr + "} type: " + varType);
@@ -168,7 +173,19 @@ public class VariableReplacer implements SubstitutionFilter {
                 return calendarVariable(Calendar.MILLISECOND);
 
             case TypeConverter.TYPE_ATTRIBUTE:
-                return attributeVariable(varSubName == null ? null : hsRequest.getAttribute(varSubName), varSubName);
+                String attributeValue = (String)hsRequest.getAttribute(varSubName);
+                if (null == attributeValue) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(varSubName + " doesn't exist");
+                    }
+                    if (null != defaultValue) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("default value '" + defaultValue + "' exists");
+                        }
+                        attributeValue = defaultValue;
+                    }
+                }
+                return StringUtils.notNull(attributeValue);
             case TypeConverter.TYPE_AUTH_TYPE:
                 return StringUtils.notNull(hsRequest.getAuthType());
             case TypeConverter.TYPE_CHARACTER_ENCODING:

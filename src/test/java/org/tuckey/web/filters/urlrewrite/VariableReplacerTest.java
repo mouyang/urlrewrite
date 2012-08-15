@@ -75,5 +75,9 @@ public class VariableReplacerTest extends TestCase {
         assertEquals("http://testurl", result);
     }
 
-    
+    public final void testAttributeDefaultString() {
+        final String result = VariableReplacer.replace("%{attribute:color:blue}", request);
+        
+        assertEquals("blue", result);
+    }
 }
