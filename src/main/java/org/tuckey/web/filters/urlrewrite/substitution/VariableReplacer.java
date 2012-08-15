@@ -298,18 +298,6 @@ public class VariableReplacer implements SubstitutionFilter {
     }
 
 
-    private static String attributeVariable(Object attribObject, String name) {
-        String attribValue = null;
-        if (attribObject == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(name + " doesn't exist");
-            }
-        } else {
-            attribValue = attribObject.toString();
-        }
-        return StringUtils.notNull(attribValue);
-    }
-
     private static String cookieVariable(Cookie[] cookies, String name) {
         if (cookies == null) {
             // we will have to do an exists check
