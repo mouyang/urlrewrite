@@ -203,7 +203,14 @@ public class VariableReplacer implements SubstitutionFilter {
             case TypeConverter.TYPE_METHOD:
                 return StringUtils.notNull(hsRequest.getMethod());
             case TypeConverter.TYPE_PARAMETER:
-                return StringUtils.notNull(varSubName == null ? null : hsRequest.getParameter(varSubName));
+                String parameterValue = null;
+                if (null != varSubName) {
+                    parameterValue = hsRequest.getParameter(varSubName);
+                    if (null == parameterValue && null != defaultValue) {
+                        parameterValue = defaultValue;
+                    }
+                }
+                return StringUtils.notNull(parameterValue);
             case TypeConverter.TYPE_PATH_INFO:
                 return StringUtils.notNull(hsRequest.getPathInfo());
             case TypeConverter.TYPE_PATH_TRANSLATED:

@@ -80,4 +80,10 @@ public class VariableReplacerTest extends TestCase {
         
         assertEquals("blue", result);
     }
+
+    public final void testParameterDefaultString() {
+        final String result = VariableReplacer.replace("%{parameter:color:blue}", request);
+        
+        assertEquals("blue", result);
+    }
 }
