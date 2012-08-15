@@ -242,8 +242,19 @@ public class VariableReplacer implements SubstitutionFilter {
                 if (session != null && varSubName != null) {
                     sessionAttributeValue = session.getAttribute(varSubName);
                 }
-                return attributeVariable(sessionAttributeValue, varSubName);
 
+                if (null == sessionAttributeValue) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(varSubName + " doesn't exist");
+                    }
+                    if (null != defaultValue) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("default value '" + defaultValue + "' exists");
+                        }
+                        sessionAttributeValue = defaultValue;
+                    }
+                }
+                return StringUtils.notNull(sessionAttributeValue == null ? null : sessionAttributeValue.toString());
             case TypeConverter.TYPE_SESSION_IS_NEW:
                 boolean sessionNew = false;
                 HttpSession sessionIsNew = hsRequest.getSession(false);

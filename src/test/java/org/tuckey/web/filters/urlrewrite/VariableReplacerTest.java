@@ -51,6 +51,18 @@ public class VariableReplacerTest extends TestCase {
         assertEquals("abcd$sredefg", result);
     }
 
+    /**
+     * try a session variable that is not a string
+     */
+    public final void testReplaceInteger() {
+        Integer integer = new Integer(1);
+
+        request.getSession(true).setAttribute("integer", integer);
+        final String result = VariableReplacer.replace("%{session-attribute:integer}", request);
+
+        assertEquals(integer.toString(), result);
+    }
+
     public final void testReplaceWithDollar() {
         request.getSession(true).setAttribute("color", "ab$cd");
         final String result = VariableReplacer.replace("%{session-attribute:color}", request);
@@ -83,6 +95,12 @@ public class VariableReplacerTest extends TestCase {
 
     public final void testParameterDefaultString() {
         final String result = VariableReplacer.replace("%{parameter:color:blue}", request);
+        
+        assertEquals("blue", result);
+    }
+
+    public final void testSessionAttributeDefaultString() {
+        final String result = VariableReplacer.replace("%{session-attribute:color:blue}", request);
         
         assertEquals("blue", result);
     }
