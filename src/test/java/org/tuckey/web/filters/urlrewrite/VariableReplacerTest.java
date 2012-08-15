@@ -1,10 +1,12 @@
 package org.tuckey.web.filters.urlrewrite;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+
 import junit.framework.TestCase;
+
 import org.tuckey.web.filters.urlrewrite.substitution.VariableReplacer;
 import org.tuckey.web.testhelper.MockRequest;
-
-import javax.servlet.ServletContext;
 
 /**
  * @author Tim Morrow
@@ -103,5 +105,18 @@ public class VariableReplacerTest extends TestCase {
         final String result = VariableReplacer.replace("%{session-attribute:color:blue}", request);
         
         assertEquals("blue", result);
+    }
+
+    public final void testCookieDefaultString() {
+        final String result = VariableReplacer.replace("%{cookie:color:blue}", request);
+        
+        assertEquals("blue", result);
+    }
+
+    public final void testCookieNull() {
+        request.addCookie(new Cookie("dummy", "cookie"));
+        final String result = VariableReplacer.replace("%{cookie:color}", request);
+        
+        assertEquals("", result);
     }
 }

@@ -197,7 +197,11 @@ public class VariableReplacer implements SubstitutionFilter {
             case TypeConverter.TYPE_CONTEXT_PATH:
                 return StringUtils.notNull(hsRequest.getContextPath());
             case TypeConverter.TYPE_COOKIE:
-                return cookieVariable(hsRequest.getCookies(), varSubName);
+                String cookieValue = cookieVariable(hsRequest.getCookies(), varSubName);
+                if (StringUtils.isBlank(cookieValue) && null != defaultValue) {
+                    cookieValue = defaultValue;
+                }
+                return StringUtils.notNull(cookieValue);
             case TypeConverter.TYPE_LOCAL_PORT:
                 return String.valueOf(hsRequest.getLocalPort());
             case TypeConverter.TYPE_METHOD:
