@@ -90,6 +90,12 @@ public class FunctionReplacerTest extends TestCase {
         assertEquals("a4 b", FunctionReplacer.replace("a${length:asdf} b"));
     }
 
+    public void testDateParse() throws InvocationTargetException, IOException, ServletException {
+        String subject = "a${dateParse:1970-01-01 000000 -0000:yyyy-MM-dd hhmmss Z} b";
+        assertTrue(FunctionReplacer.containsFunction(subject));
+        assertEquals("a0 b", FunctionReplacer.replace(subject));
+    }
+
     public void testRecursive() throws InvocationTargetException, IOException, ServletException {
         assertTrue(FunctionReplacer.containsFunction("a${upper:${lower:fOObAR}} b"));
         assertEquals("aFOOBAR b", FunctionReplacer.replace("a${upper:${lower:fOObAR}} b"));

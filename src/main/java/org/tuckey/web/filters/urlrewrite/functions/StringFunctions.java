@@ -1,15 +1,17 @@
 package org.tuckey.web.filters.urlrewrite.functions;
 
-import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionContext;
-import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionFilterChain;
-import org.tuckey.web.filters.urlrewrite.utils.Log;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
+
+import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionContext;
+import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionFilterChain;
+import org.tuckey.web.filters.urlrewrite.utils.Log;
 
 
 public class StringFunctions {
@@ -163,4 +165,20 @@ public class StringFunctions {
         return subject.replaceFirst(replace, with);
     }
 
+    public static String dateParse(String subject, SubstitutionFilterChain nextFilter, SubstitutionContext ctx) {
+        String dateString = "";
+        String dateFormatString = "";
+        if (FIND_COLON_PATTERN.matcher(subject).find()) {
+            dateString = subject.substring(0, subject.indexOf(':'));
+            dateFormatString = subject.substring(subject.indexOf(':') + 1);
+        }
+        dateString = nextFilter.substitute(dateString, ctx);
+
+        try {
+            return String.valueOf(new SimpleDateFormat(dateFormatString).parse(dateString).getTime());
+        } catch (ParseException e) {
+            log.error(e, e);
+        }
+        return null;
+    }
 }
