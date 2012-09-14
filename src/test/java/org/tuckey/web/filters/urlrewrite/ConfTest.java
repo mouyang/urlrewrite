@@ -80,6 +80,7 @@ public class ConfTest extends TestCase {
         assertEquals("name of set, it's " + set.getName(), "valuenull", set.getName());
         assertNull("value of set should be null, it's " + set.getValue(), set.getValue());
         assertEquals("othercontext", rule.getToContextStr());
+        assertTrue(rule.isStripTrailingQuestionMarks());
 
         NormalRule rule1 = (NormalRule) rules.get(1);
         assertEquals("basicfrom2", rule1.getFrom());
@@ -109,6 +110,12 @@ public class ConfTest extends TestCase {
         OutboundRule outboundRule = (OutboundRule) outboundRules.get(0);
         assertEquals("default encode on to test", outboundRule.getName());
         assertEquals(true, outboundRule.isEncodeToUrl());
+
+        NormalRule rule9 = (NormalRule) rules.get(9);
+        assertTrue(rule9.isStripTrailingQuestionMarks());
+
+        NormalRule rule10 = (NormalRule) rules.get(10);
+        assertFalse(rule10.isStripTrailingQuestionMarks());
 
         CatchElem catchElem = (CatchElem) catches.get(0);
         assertEquals(true, catchElem.isValid());

@@ -251,6 +251,7 @@ public class Conf {
                 rule.setToType(getAttrValue(toNode, "type"));
                 rule.setToContextStr(getAttrValue(toNode, "context"));
                 rule.setToLast(getAttrValue(toNode, "last"));
+                rule.setStripTrailingQuestionMarks(getAttrValue(toNode, "trailqmstrip"));
                 rule.setQueryStringAppend(getAttrValue(toNode, "qsappend"));
                 if ("true".equalsIgnoreCase(getAttrValue(toNode, "encode"))) rule.setEncodeToUrl(true);
 

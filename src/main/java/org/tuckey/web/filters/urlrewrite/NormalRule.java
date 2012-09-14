@@ -70,6 +70,7 @@ public class NormalRule extends RuleBase implements Rule {
     private boolean queryStringAppend = false;
     private String toContextStr = null;
     private ServletContext toServletContext = null;
+    protected boolean stripTrailingQuestionMarks = true;
 
     /**
      * Constructor.
@@ -97,6 +98,19 @@ public class NormalRule extends RuleBase implements Rule {
         if ( queryStringAppend && hsRequest.getQueryString() != null ) {
             String target = ruleExecutionOutput.getReplacedUrl();
             ruleExecutionOutput.setReplacedUrl(target + "&" + hsRequest.getQueryString());
+        }
+        if (isLast()) {
+            if (stripTrailingQuestionMarks) {
+                String target = ruleExecutionOutput.getReplacedUrl();
+                for (int index = target.length() - 1; index >= 0; index--) {
+                    if ('?' != target.charAt(index)) {
+                        if (index != target.length()) {
+                            ruleExecutionOutput.setReplacedUrl(target.substring(0, index + 1));
+                        }
+                        break;
+                    }
+                }
+            }
         }
         if ( toServletContext != null ) ruleExecutionOutput.setReplacedUrlContext(toServletContext);
         return RuleExecutionOutput.getRewritenUrl(toType, encodeToUrl, ruleExecutionOutput);
@@ -229,5 +243,16 @@ public class NormalRule extends RuleBase implements Rule {
 
     public void setQueryStringAppend(String value) {
         queryStringAppend = "true".equalsIgnoreCase(value);
+    }
+
+    public boolean isStripTrailingQuestionMarks() {
+        return stripTrailingQuestionMarks;
+    }
+
+    public void setStripTrailingQuestionMarks(String value) {
+        if (null == value) {
+            return;
+        }
+        stripTrailingQuestionMarks = "true".equalsIgnoreCase(value);
     }
 }

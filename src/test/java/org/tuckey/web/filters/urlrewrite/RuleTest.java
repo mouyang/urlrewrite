@@ -813,4 +813,79 @@ public class RuleTest extends TestCase {
         NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
         assertEquals("/not-found-the-dir", rewrittenUrl.getTarget());
     }
+
+    public void testStripNoTrailingQuestionMarks() throws IOException, ServletException, InvocationTargetException {
+        NormalRule rule = new NormalRule();
+        rule.setFrom("simple");
+        rule.setTo("simpleTransformed");
+        rule.setStripTrailingQuestionMarks("true");
+        rule.setToLast("true");
+        rule.initialise(null);
+        MockRequest request = new MockRequest("simple");
+        NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
+
+        assertEquals("forward should be default type", "forward", rule.getToType());
+        assertEquals("simpleTransformed", rewrittenUrl.getTarget());
+        assertTrue("Should be a forward", rewrittenUrl.isForward());
+    }
+
+    public void testSplitSingleTrailingQuestionMarks() throws IOException, ServletException, InvocationTargetException {
+        NormalRule rule = new NormalRule();
+        rule.setFrom("simple");
+        rule.setTo("simpleTransformed?");
+        rule.setStripTrailingQuestionMarks("true");
+        rule.setToLast("true");
+        rule.initialise(null);
+        MockRequest request = new MockRequest("simple");
+        NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
+
+        assertEquals("forward should be default type", "forward", rule.getToType());
+        assertEquals("simpleTransformed", rewrittenUrl.getTarget());
+        assertTrue("Should be a forward", rewrittenUrl.isForward());
+    }
+
+    public void testSplitMultipleTrailingQuestionMarks() throws IOException, ServletException, InvocationTargetException {
+        NormalRule rule = new NormalRule();
+        rule.setFrom("simple");
+        rule.setTo("simpleTransformed????????");
+        rule.setStripTrailingQuestionMarks("true");
+        rule.setToLast("true");
+        rule.initialise(null);
+        MockRequest request = new MockRequest("simple");
+        NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
+
+        assertEquals("forward should be default type", "forward", rule.getToType());
+        assertEquals("simpleTransformed", rewrittenUrl.getTarget());
+        assertTrue("Should be a forward", rewrittenUrl.isForward());
+    }
+
+    public void testDoNotStripMiddleQuestionMarks() throws IOException, ServletException, InvocationTargetException {
+        NormalRule rule = new NormalRule();
+        rule.setFrom("simple");
+        rule.setTo("simple????Transformed");
+        rule.setStripTrailingQuestionMarks("true");
+        rule.setToLast("true");
+        rule.initialise(null);
+        MockRequest request = new MockRequest("simple");
+        NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
+
+        assertEquals("forward should be default type", "forward", rule.getToType());
+        assertEquals("simple????Transformed", rewrittenUrl.getTarget());
+        assertTrue("Should be a forward", rewrittenUrl.isForward());
+    }
+
+    public void testDoNotStripTrailingQuestionMarks() throws IOException, ServletException, InvocationTargetException {
+        NormalRule rule = new NormalRule();
+        rule.setFrom("simple");
+        rule.setTo("simpleTransformed?");
+        rule.setStripTrailingQuestionMarks("true");
+        rule.setToLast("false");
+        rule.initialise(null);
+        MockRequest request = new MockRequest("simple");
+        NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
+
+        assertEquals("forward should be default type", "forward", rule.getToType());
+        assertEquals("simpleTransformed?", rewrittenUrl.getTarget());
+        assertTrue("Should be a forward", rewrittenUrl.isForward());
+    }
 }

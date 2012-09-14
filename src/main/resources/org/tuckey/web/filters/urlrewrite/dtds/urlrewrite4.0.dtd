@@ -61,6 +61,7 @@ last (true|false) "false"
 qsappend (true|false) "false"
 encode (true|false) #IMPLIED
 context CDATA  #IMPLIED
+trailqmstrip (true|false) "true"
 >
 
 <!--
