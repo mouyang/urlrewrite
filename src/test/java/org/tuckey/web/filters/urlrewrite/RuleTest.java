@@ -813,4 +813,20 @@ public class RuleTest extends TestCase {
         NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
         assertEquals("/not-found-the-dir", rewrittenUrl.getTarget());
     }
+
+    public void testEmptyQueryStringAppend() throws IOException, ServletException, InvocationTargetException {
+        NormalRule rule = new NormalRule();
+        rule.setFrom("emptyQueryString");
+        rule.setTo("emptyQueryString");
+        rule.setQueryStringAppend("true");
+        rule.initialise(null);
+        MockRequest request = new MockRequest("emptyQueryString");
+        request.setQueryString("");
+        NormalRewrittenUrl rewrittenUrl = (NormalRewrittenUrl) rule.matches(request.getRequestURI(), request, response);
+
+        assertEquals("forward should be default type", "forward", rule.getToType());
+        assertEquals("emptyQueryString", rewrittenUrl.getTarget());
+        assertTrue("Should be a forward", rewrittenUrl.isForward());
+    }
+
 }

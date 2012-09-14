@@ -94,7 +94,7 @@ public class NormalRule extends RuleBase implements Rule {
             // no match, or run/set only match
             return null;
         }
-        if ( queryStringAppend && hsRequest.getQueryString() != null ) {
+        if ( queryStringAppend && !StringUtils.isBlank(hsRequest.getQueryString()) ) {
             String target = ruleExecutionOutput.getReplacedUrl();
             ruleExecutionOutput.setReplacedUrl(target + "&" + hsRequest.getQueryString());
         }
