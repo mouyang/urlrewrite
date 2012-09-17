@@ -34,6 +34,7 @@
  */
 package org.tuckey.web.filters.urlrewrite;
 
+import org.tuckey.web.filters.urlrewrite.utils.BidirectionalMap;
 import org.tuckey.web.filters.urlrewrite.utils.StringUtils;
 
 /**
@@ -99,109 +100,62 @@ public class TypeConverter {
     public static final short TYPE_REQUEST_FILENAME = 44;
     public static final short TYPE_SERVLET_CONTEXT = 45;
 
+    private static BidirectionalMap<Short, String> typeMap = new BidirectionalMap<Short, String>();
+    static {
+        typeMap.addPair(TYPE_TIME, "time");
+        typeMap.addPair(TYPE_TIME_YEAR, "year");
+        typeMap.addPair(TYPE_TIME_MONTH, "month");
+        typeMap.addPair(TYPE_TIME_DAY_OF_MONTH, "dayofmonth");
+        typeMap.addPair(TYPE_TIME_DAY_OF_WEEK, "dayofweek");
+        typeMap.addPair(TYPE_TIME_AMPM, "ampm");
+        typeMap.addPair(TYPE_TIME_HOUR_OF_DAY, "hourofday");
+        typeMap.addPair(TYPE_TIME_MINUTE, "minute");
+        typeMap.addPair(TYPE_TIME_SECOND, "second");
+        typeMap.addPair(TYPE_TIME_MILLISECOND, "millisecond");
+        typeMap.addPair(TYPE_ATTRIBUTE, "attribute");
+        typeMap.addPair(TYPE_AUTH_TYPE, "auth-type");
+        typeMap.addPair(TYPE_CHARACTER_ENCODING, "character-encoding");
+        typeMap.addPair(TYPE_CONTENT_LENGTH, "content-length");
+        typeMap.addPair(TYPE_CONTENT_TYPE, "content-type");
+        typeMap.addPair(TYPE_CONTEXT_PATH, "context-path");
+        typeMap.addPair(TYPE_COOKIE, "cookie");
+        typeMap.addPair(TYPE_HEADER, "header");
+        typeMap.addPair(TYPE_LOCAL_PORT, "local-port");
+        typeMap.addPair(TYPE_METHOD, "method");
+        typeMap.addPair(TYPE_PARAMETER, "parameter");
+        typeMap.addPair(TYPE_PATH_INFO, "path-info");
+        typeMap.addPair(TYPE_PATH_TRANSLATED, "path-translated");
+        typeMap.addPair(TYPE_PROTOCOL, "protocol");
+        typeMap.addPair(TYPE_QUERY_STRING, "query-string");
+        typeMap.addPair(TYPE_REMOTE_ADDR, "remote-addr");
+        typeMap.addPair(TYPE_REMOTE_HOST, "remote-host");
+        typeMap.addPair(TYPE_REMOTE_USER, "remote-user");
+        typeMap.addPair(TYPE_REQUESTED_SESSION_ID, "requested-session-id");
+        typeMap.addPair(TYPE_REQUESTED_SESSION_ID_FROM_COOKIE, "requested-session-id-from-cookie");
+        typeMap.addPair(TYPE_REQUESTED_SESSION_ID_FROM_URL, "requested-session-id-from-url");
+        typeMap.addPair(TYPE_REQUESTED_SESSION_ID_VALID, "requested-session-id-valid");
+        typeMap.addPair(TYPE_REQUEST_URI, "request-uri");
+        typeMap.addPair(TYPE_REQUEST_URL, "request-url");
+        typeMap.addPair(TYPE_SESSION_ATTRIBUTE, "session-attribute");
+        typeMap.addPair(TYPE_SESSION_IS_NEW, "session-isnew");
+        typeMap.addPair(TYPE_SERVER_PORT, "port");
+        typeMap.addPair(TYPE_SERVER_NAME, "server-name");
+        typeMap.addPair(TYPE_SCHEME, "scheme");
+        typeMap.addPair(TYPE_USER_IN_ROLE, "user-in-role");
+        typeMap.addPair(TYPE_EXCEPTION, "exception");
+        typeMap.addPair(TYPE_REQUEST_FILENAME, "request-filename");
+        typeMap.addPair(TYPE_SERVLET_CONTEXT, "context");
+    }
+
     /**
      * Will get the type code ie, method, port, header etc.
      *
      * @return String
      */
     public String getType() {
-        switch (type) {
+        String returnValue = typeMap.getValue(type);
+        return returnValue != null ? returnValue : "";
 
-            case TYPE_TIME:
-                return "time";
-            case TYPE_TIME_YEAR:
-                return "year";
-            case TYPE_TIME_MONTH:
-                return "month";
-            case TYPE_TIME_DAY_OF_MONTH:
-                return "dayofmonth";
-            case TYPE_TIME_DAY_OF_WEEK:
-                return "dayofweek";
-
-            case TYPE_TIME_AMPM:
-                return "ampm";
-            case TYPE_TIME_HOUR_OF_DAY:
-                return "hourofday";
-            case TYPE_TIME_MINUTE:
-                return "minute";
-            case TYPE_TIME_SECOND:
-                return "second";
-            case TYPE_TIME_MILLISECOND:
-                return "millisecond";
-
-            case TYPE_ATTRIBUTE:
-                return "attribute";
-            case TYPE_AUTH_TYPE:
-                return "auth-type";
-            case TYPE_CHARACTER_ENCODING:
-                return "character-encoding";
-            case TYPE_CONTENT_LENGTH:
-                return "content-length";
-            case TYPE_CONTENT_TYPE:
-                return "content-type";
-
-            case TYPE_CONTEXT_PATH:
-                return "context-path";
-            case TYPE_COOKIE:
-                return "cookie";
-            case TYPE_HEADER:
-                return "header";
-            case TYPE_LOCAL_PORT:
-                return "local-port";
-            case TYPE_METHOD:
-                return "method";
-            case TYPE_PARAMETER:
-                return "parameter";
-
-            case TYPE_PATH_INFO:
-                return "path-info";
-            case TYPE_PATH_TRANSLATED:
-                return "path-translated";
-            case TYPE_PROTOCOL:
-                return "protocol";
-            case TYPE_QUERY_STRING:
-                return "query-string";
-            case TYPE_REMOTE_ADDR:
-                return "remote-addr";
-
-            case TYPE_REMOTE_HOST:
-                return "remote-host";
-            case TYPE_REMOTE_USER:
-                return "remote-user";
-            case TYPE_REQUESTED_SESSION_ID:
-                return "requested-session-id";
-            case TYPE_REQUESTED_SESSION_ID_FROM_COOKIE:
-              return "requested-session-id-from-cookie";
-            case TYPE_REQUESTED_SESSION_ID_FROM_URL:
-              return "requested-session-id-from-url";
-            case TYPE_REQUESTED_SESSION_ID_VALID:
-              return "requested-session-id-valid";
-            case TYPE_REQUEST_URI:
-                return "request-uri";
-            case TYPE_REQUEST_URL:
-                return "request-url";
-            case TYPE_SESSION_ATTRIBUTE:
-                return "session-attribute";
-            case TYPE_SESSION_IS_NEW:
-                return "session-isnew";
-            case TYPE_SERVER_PORT:
-                return "port";
-            case TYPE_SERVER_NAME:
-                return "server-name";
-            case TYPE_SCHEME:
-                return "scheme";
-
-            case TYPE_USER_IN_ROLE:
-                return "user-in-role";
-            case TYPE_EXCEPTION:
-                return "exception";
-            case TYPE_REQUEST_FILENAME:
-                return "request-filename";
-            case TYPE_SERVLET_CONTEXT:
-            	return "context";
-            default:
-                return "";
-        }
     }
 
     /**
@@ -210,105 +164,17 @@ public class TypeConverter {
      * @param strType the type
      */
     public void setType(final String strType) {
-        if ("time".equals(strType)) {
-            this.type = TYPE_TIME;
-        } else if ("year".equals(strType)) {
-            this.type = TYPE_TIME_YEAR;
-        } else if ("month".equals(strType)) {
-            this.type = TYPE_TIME_MONTH;
-        } else if ("dayofmonth".equals(strType)) {
-            this.type = TYPE_TIME_DAY_OF_MONTH;
-        } else if ("dayofweek".equals(strType)) {
-            this.type = TYPE_TIME_DAY_OF_WEEK;
-
-        } else if ("ampm".equals(strType)) {
-            this.type = TYPE_TIME_AMPM;
-        } else if ("hourofday".equals(strType)) {
-            this.type = TYPE_TIME_HOUR_OF_DAY;
-        } else if ("minute".equals(strType)) {
-            this.type = TYPE_TIME_MINUTE;
-        } else if ("second".equals(strType)) {
-            this.type = TYPE_TIME_SECOND;
-        } else if ("millisecond".equals(strType)) {
-            this.type = TYPE_TIME_MILLISECOND;
-
-        } else if ("attribute".equals(strType)) {
-            this.type = TYPE_ATTRIBUTE;
-        } else if ("auth-type".equals(strType)) {
-            this.type = TYPE_AUTH_TYPE;
-        } else if ("character-encoding".equals(strType)) {
-            this.type = TYPE_CHARACTER_ENCODING;
-        } else if ("content-length".equals(strType)) {
-            this.type = TYPE_CONTENT_LENGTH;
-        } else if ("content-type".equals(strType)) {
-            this.type = TYPE_CONTENT_TYPE;
-
-        } else if ("context-path".equals(strType)) {
-            this.type = TYPE_CONTEXT_PATH;
-        } else if ("cookie".equals(strType)) {
-            this.type = TYPE_COOKIE;
-        } else if ("header".equals(strType) || StringUtils.isBlank(strType)) {
-            this.type = TYPE_HEADER;
-        } else if ("local-port".equals(strType)) {
-            this.type = TYPE_LOCAL_PORT;
-        } else if ("method".equals(strType)) {
-            this.type = TYPE_METHOD;
-        } else if ("parameter".equals(strType) || "param".equals(strType)) {
-            this.type = TYPE_PARAMETER;
-
-        } else if ("path-info".equals(strType)) {
-            this.type = TYPE_PATH_INFO;
-        } else if ("path-translated".equals(strType)) {
-            this.type = TYPE_PATH_TRANSLATED;
-        } else if ("protocol".equals(strType)) {
-            this.type = TYPE_PROTOCOL;
-        } else if ("query-string".equals(strType)) {
-            this.type = TYPE_QUERY_STRING;
-        } else if ("remote-addr".equals(strType)) {
-            this.type = TYPE_REMOTE_ADDR;
-
-        } else if ("remote-host".equals(strType)) {
-            this.type = TYPE_REMOTE_HOST;
-        } else if ("remote-user".equals(strType)) {
-            this.type = TYPE_REMOTE_USER;
-        } else if ("requested-session-id".equals(strType)) {
-            this.type = TYPE_REQUESTED_SESSION_ID;
-        } else if ("requested-session-id-from-cookie".equals(strType)) {
-          this.type = TYPE_REQUESTED_SESSION_ID_FROM_COOKIE;
-        } else if ("requested-session-id-from-url".equals(strType)) {
-          this.type = TYPE_REQUESTED_SESSION_ID_FROM_URL;
-        } else if ("requested-session-id-valid".equals(strType)) {
-          this.type = TYPE_REQUESTED_SESSION_ID_VALID;
-        } else if ("request-uri".equals(strType)) {
-            this.type = TYPE_REQUEST_URI;
-        } else if ("request-url".equals(strType)) {
-            this.type = TYPE_REQUEST_URL;
-
-        } else if ("session-attribute".equals(strType)) {
-            this.type = TYPE_SESSION_ATTRIBUTE;
-        } else if ("session-isnew".equals(strType)) {
-            this.type = TYPE_SESSION_IS_NEW;
-        } else if ("port".equals(strType)) {
-            this.type = TYPE_SERVER_PORT;
-        } else if ("server-name".equals(strType)) {
-            this.type = TYPE_SERVER_NAME;
-        } else if ("scheme".equals(strType)) {
-            this.type = TYPE_SCHEME;
-
-        } else if ("user-in-role".equals(strType)) {
-            this.type = TYPE_USER_IN_ROLE;
-
-        } else if ("exception".equals(strType)) {
-            this.type = TYPE_EXCEPTION;
-
-        } else if ("request-filename".equals(strType)) {
-            this.type = TYPE_REQUEST_FILENAME;
-
-        } else if ("context".equals(strType)) {
-            this.type = TYPE_SERVLET_CONTEXT;
-
-        }else {
-            setError("Type " + strType + " is not valid");
+        Short typeValue = typeMap.getKey(strType);
+        if (typeValue != null) {
+            this.type = typeValue;
+        } else {
+            if (StringUtils.isBlank(strType)) {
+                this.type = TYPE_HEADER;
+            } else if ("param".equals(strType)) {
+                this.type = TYPE_PARAMETER;
+            } else {
+                setError("Operator " + strType + " is not valid");
+            }
         }
     }
 

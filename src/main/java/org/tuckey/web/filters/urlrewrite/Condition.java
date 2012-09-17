@@ -34,6 +34,7 @@
  */
 package org.tuckey.web.filters.urlrewrite;
 
+import org.tuckey.web.filters.urlrewrite.utils.BidirectionalMap;
 import org.tuckey.web.filters.urlrewrite.utils.Log;
 import org.tuckey.web.filters.urlrewrite.utils.NumberUtils;
 import org.tuckey.web.filters.urlrewrite.utils.RegexPattern;
@@ -116,6 +117,23 @@ public class Condition extends TypeConverter {
     private static final short OPERATOR_NOT_DIR = 11;
     private static final short OPERATOR_NOT_FILE = 12;
     private static final short OPERATOR_NOT_FILE_WITH_SIZE = 13;
+
+    private static BidirectionalMap<Short, String> operatorMap = new BidirectionalMap<Short, String>();
+    static {
+        operatorMap.addPair(OPERATOR_NOT_EQUAL, "notequal");
+        operatorMap.addPair(OPERATOR_GREATER_THAN, "greater");
+        operatorMap.addPair(OPERATOR_LESS_THAN, "less");
+        operatorMap.addPair(OPERATOR_GREATER_THAN_OR_EQUAL, "greaterorequal");
+        operatorMap.addPair(OPERATOR_LESS_THAN_OR_EQUAL, "lessorequal");
+        operatorMap.addPair(OPERATOR_INSTANCEOF, "instanceof");
+        operatorMap.addPair(OPERATOR_EQUAL, "equal");
+        operatorMap.addPair(OPERATOR_IS_DIR, "isdir");
+        operatorMap.addPair(OPERATOR_IS_FILE, "isfile");
+        operatorMap.addPair(OPERATOR_IS_FILE_WITH_SIZE, "isfilewithsize");
+        operatorMap.addPair(OPERATOR_NOT_DIR, "notdir");
+        operatorMap.addPair(OPERATOR_NOT_FILE, "notfile");
+        operatorMap.addPair(OPERATOR_NOT_FILE_WITH_SIZE, "notfilewithsize");
+    }
 
     // if we are doing an instanceof test the class we want to test against
     Class instanceOfClass = null;
@@ -587,43 +605,14 @@ public class Condition extends TypeConverter {
         log.error("Condition " + id + " had error: " + s);
     }
 
-
     /**
      * Will get the operator type.
      *
      * @return notequal, greater etc.
      */
     public String getOperator() {
-        switch (operator) {
-            case OPERATOR_NOT_EQUAL:
-                return "notequal";
-            case OPERATOR_GREATER_THAN:
-                return "greater";
-            case OPERATOR_LESS_THAN:
-                return "less";
-            case OPERATOR_GREATER_THAN_OR_EQUAL:
-                return "greaterorequal";
-            case OPERATOR_LESS_THAN_OR_EQUAL:
-                return "lessorequal";
-            case OPERATOR_INSTANCEOF:
-                return "instanceof";
-            case OPERATOR_EQUAL:
-                return "equal";
-            case OPERATOR_IS_DIR:
-                return "isdir";
-            case OPERATOR_IS_FILE:
-                return "isfile";
-            case OPERATOR_IS_FILE_WITH_SIZE:
-                return "isfilewithsize";
-            case OPERATOR_NOT_DIR:
-                return "notdir";
-            case OPERATOR_NOT_FILE:
-                return "notfile";
-            case OPERATOR_NOT_FILE_WITH_SIZE:
-                return "notfilewithsize";
-            default:
-                return "";
-        }
+        String returnValue = operatorMap.getValue(operator);
+        return returnValue != null ? returnValue : "";
     }
 
     /**
@@ -632,34 +621,15 @@ public class Condition extends TypeConverter {
      * @param operator type
      */
     public void setOperator(final String operator) {
-        if ("notequal".equals(operator)) {
-            this.operator = OPERATOR_NOT_EQUAL;
-        } else if ("greater".equals(operator)) {
-            this.operator = OPERATOR_GREATER_THAN;
-        } else if ("less".equals(operator)) {
-            this.operator = OPERATOR_LESS_THAN;
-        } else if ("greaterorequal".equals(operator)) {
-            this.operator = OPERATOR_GREATER_THAN_OR_EQUAL;
-        } else if ("lessorequal".equals(operator)) {
-            this.operator = OPERATOR_LESS_THAN_OR_EQUAL;
-        } else if ("instanceof".equals(operator)) {
-            this.operator = OPERATOR_INSTANCEOF;
-        } else if ("equal".equals(operator) || StringUtils.isBlank(operator)) {
-            this.operator = OPERATOR_EQUAL;
-        } else if ("isdir".equals(operator)) {
-            this.operator = OPERATOR_IS_DIR;
-        } else if ("isfile".equals(operator)) {
-            this.operator = OPERATOR_IS_FILE;
-        } else if ("isfilewithsize".equals(operator)) {
-            this.operator = OPERATOR_IS_FILE_WITH_SIZE;
-        } else if ("notdir".equals(operator)) {
-            this.operator = OPERATOR_NOT_DIR;
-        } else if ("notfile".equals(operator)) {
-            this.operator = OPERATOR_NOT_FILE;
-        } else if ("notfilewithsize".equals(operator)) {
-            this.operator = OPERATOR_NOT_FILE_WITH_SIZE;
+        Short operatorValue = operatorMap.getKey(operator);
+        if (operatorValue != null) {
+            this.operator = operatorValue;
         } else {
-            setError("Operator " + operator + " is not valid");
+            if (StringUtils.isBlank(operator)) {
+                this.operator = OPERATOR_EQUAL;
+            } else {
+                setError("Operator " + operator + " is not valid");
+            }
         }
     }
 
