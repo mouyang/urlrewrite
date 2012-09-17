@@ -1,15 +1,16 @@
 package org.tuckey.web.filters.urlrewrite.functions;
 
-import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionContext;
-import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionFilterChain;
-import org.tuckey.web.filters.urlrewrite.utils.Log;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
+
+import org.tuckey.web.filters.urlrewrite.RewriteMap;
+import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionContext;
+import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionFilterChain;
+import org.tuckey.web.filters.urlrewrite.utils.Log;
 
 
 public class StringFunctions {
@@ -163,4 +164,28 @@ public class StringFunctions {
         return subject.replaceFirst(replace, with);
     }
 
+    public static String rewriteMap(String subject, SubstitutionFilterChain nextFilter, SubstitutionContext ctx) {
+        String mapName = "";
+        String lookupKey = "";
+        String defaultValue = null;
+        if (FIND_COLON_PATTERN.matcher(subject).find()) {
+            mapName = subject.substring(0, subject.indexOf(':'));
+            subject = subject.substring(subject.indexOf(':') + 1);
+            if (FIND_COLON_PATTERN.matcher(subject).find()) {
+                lookupKey = subject.substring(0, subject.indexOf(':'));
+                defaultValue = subject.substring(subject.indexOf(':') + 1);
+            } else {
+                lookupKey = subject;
+            }
+        }
+        String returnValue = nextFilter.substitute(lookupKey, ctx);
+        RewriteMap rewriteMap = ctx.getRewriteMaps().get(mapName);
+        if (null != rewriteMap) {
+            returnValue = rewriteMap.getValue(returnValue);
+            if (null == returnValue) {
+                returnValue = defaultValue;
+            }
+        }
+        return returnValue;
+    }
 }

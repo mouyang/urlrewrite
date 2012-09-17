@@ -148,6 +148,8 @@ public class FunctionReplacer implements SubstitutionFilter {
             functionResult = StringFunctions.trim(varSubName, redoFunctionFilter, ctx);
         } else if ("length".equalsIgnoreCase(varType)) {
             functionResult = StringFunctions.length(varSubName, redoFunctionFilter, ctx);
+        } else if ("rewriteMap".equalsIgnoreCase(varType)) {
+            functionResult = StringFunctions.rewriteMap(varSubName, redoFunctionFilter, ctx);
         } else {
             log.error("function ${" + originalVarStr + "} type '" + varType + "' not a valid type");
         }

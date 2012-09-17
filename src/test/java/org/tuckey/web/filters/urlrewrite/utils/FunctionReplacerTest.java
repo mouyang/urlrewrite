@@ -1,12 +1,20 @@
 package org.tuckey.web.filters.urlrewrite.utils;
 
-import junit.framework.TestCase;
-import org.tuckey.web.filters.urlrewrite.substitution.FunctionReplacer;
-
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+
+import junit.framework.TestCase;
+
+import org.tuckey.web.filters.urlrewrite.RewriteMap;
+import org.tuckey.web.filters.urlrewrite.substitution.ChainedSubstitutionFilters;
+import org.tuckey.web.filters.urlrewrite.substitution.FunctionReplacer;
+import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionContext;
 
 
 public class FunctionReplacerTest extends TestCase {
@@ -95,4 +103,47 @@ public class FunctionReplacerTest extends TestCase {
         assertEquals("aFOOBAR b", FunctionReplacer.replace("a${upper:${lower:fOObAR}} b"));
     }
 
+    public void testRewriteMap() throws InvocationTargetException, IOException, ServletException {
+        final String subjectOfReplacement = "a${rewriteMap:constantMap:key} b";
+        Map<String, RewriteMap> rewriteMaps = new HashMap<String, RewriteMap>();
+        rewriteMaps.put("constantMap", new RewriteMap() {
+            public String getValue(String key) {
+                return "Newvalue";
+            }
+        });
+
+        SubstitutionContext ctx = new SubstitutionContext(null, null, null, null, rewriteMaps);
+
+        assertTrue(FunctionReplacer.containsFunction(subjectOfReplacement));
+        assertEquals(
+              "aNewvalue b"
+            , new FunctionReplacer().substitute(
+                subjectOfReplacement, 
+                ctx, 
+                new ChainedSubstitutionFilters(Collections.EMPTY_LIST)
+            )
+        );
+    }
+
+    public void testRewriteMapDefaultValue() throws InvocationTargetException, IOException, ServletException {
+        final String subjectOfReplacement = "a${rewriteMap:nullMap:oldValue:default} b";
+        Map<String, RewriteMap> rewriteMaps = new HashMap<String, RewriteMap>();
+        rewriteMaps.put("nullMap", new RewriteMap() {
+            public String getValue(String key) {
+                return null;
+            }
+        });
+
+        SubstitutionContext ctx = new SubstitutionContext(null, null, null, null, rewriteMaps);
+
+        assertTrue(FunctionReplacer.containsFunction(subjectOfReplacement));
+        assertEquals(
+              "adefault b"
+            , new FunctionReplacer().substitute(
+                subjectOfReplacement, 
+                ctx, 
+                new ChainedSubstitutionFilters(Collections.EMPTY_LIST)
+            )
+        );
+    }
 }
