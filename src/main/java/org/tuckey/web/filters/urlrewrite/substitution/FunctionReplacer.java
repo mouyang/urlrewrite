@@ -34,12 +34,16 @@
  */
 package org.tuckey.web.filters.urlrewrite.substitution;
 
-import org.tuckey.web.filters.urlrewrite.functions.StringFunctions;
-import org.tuckey.web.filters.urlrewrite.utils.Log;
-
+import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.tuckey.web.filters.urlrewrite.functions.string.StringTransformStrategy;
+import org.tuckey.web.filters.urlrewrite.utils.Log;
 
 /**
  * Helper class for function replacement.
@@ -49,9 +53,27 @@ import java.util.regex.Pattern;
  */
 public class FunctionReplacer implements SubstitutionFilter {
 
-    private static Log log = Log.getLog(VariableReplacer.class);
+    private static Log log = Log.getLog(FunctionReplacer.class);
 
     private static Pattern functionPattern = Pattern.compile("(?<!\\\\)\\$\\{(.*)\\}");
+
+    private static Map<String, StringTransformStrategy> functions = new HashMap<String, StringTransformStrategy>();
+    static {
+        Properties functionClass = new Properties();
+        try {
+            functionClass.load(FunctionReplacer.class.getResourceAsStream("/org/tuckey/web/filters/urlrewrite/functions/string/function-class-mapping.properties"));
+            for (Object object : functionClass.keySet()) {
+                String key = (String) object;
+                try {
+                    functions.put(key.toLowerCase(), (StringTransformStrategy) Class.forName((String)functionClass.get(key)).newInstance());
+                } catch (Exception e) {
+                    log.error(e, e);
+                }
+            }
+        } catch (IOException e) {
+            log.error(e, e);
+        }
+    }
 
     public static boolean containsFunction(String to) {
         Matcher functionMatcher = functionPattern.matcher(to);
@@ -127,27 +149,10 @@ public class FunctionReplacer implements SubstitutionFilter {
             }
 
         };
+        
         // check for some built in functions
-        if ("replace".equalsIgnoreCase(varType) || "replaceAll".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.replaceAll(varSubName, redoFunctionFilter, ctx);
-        } else if ("replaceFirst".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.replaceFirst(varSubName, redoFunctionFilter, ctx);
-        } else if ("escape".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.escape(varSubName, redoFunctionFilter, ctx);
-        } else if ("escapePath".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.escapePath(varSubName, redoFunctionFilter, ctx);
-        } else if ("unescape".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.unescape(varSubName, redoFunctionFilter, ctx);
-        } else if ("unescapePath".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.unescapePath(varSubName, redoFunctionFilter, ctx);
-        } else if ("lower".equalsIgnoreCase(varType) || "toLower".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.toLower(varSubName, redoFunctionFilter, ctx);
-        } else if ("upper".equalsIgnoreCase(varType) || "toUpper".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.toUpper(varSubName, redoFunctionFilter, ctx);
-        } else if ("trim".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.trim(varSubName, redoFunctionFilter, ctx);
-        } else if ("length".equalsIgnoreCase(varType)) {
-            functionResult = StringFunctions.length(varSubName, redoFunctionFilter, ctx);
+        if (functions.containsKey(varType.toLowerCase())) {
+            functionResult = functions.get(varType.toLowerCase()).transform(varSubName, redoFunctionFilter, ctx);
         } else {
             log.error("function ${" + originalVarStr + "} type '" + varType + "' not a valid type");
         }
