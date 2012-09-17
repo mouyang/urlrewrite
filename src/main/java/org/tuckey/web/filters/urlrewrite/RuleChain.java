@@ -34,7 +34,11 @@
  */
 package org.tuckey.web.filters.urlrewrite;
 
-import org.tuckey.web.filters.urlrewrite.utils.Log;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -42,10 +46,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.HashMap;
+
+import org.tuckey.web.filters.urlrewrite.utils.Log;
 
 /**
  * Chain of rules.  Implemented as a chain so that java rules can filter the request, resposne.
@@ -177,4 +179,7 @@ public class RuleChain implements FilterChain {
         }
     }
 
+    public Map<String, RewriteMap> getRewriteMaps() {
+        return urlRewriter.getConf().getRewriteMaps();
+    }
 }

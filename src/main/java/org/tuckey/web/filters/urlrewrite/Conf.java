@@ -34,6 +34,22 @@
  */
 package org.tuckey.web.filters.urlrewrite;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.tuckey.web.filters.urlrewrite.gzip.GzipFilter;
 import org.tuckey.web.filters.urlrewrite.utils.Log;
 import org.tuckey.web.filters.urlrewrite.utils.ModRewriteConfLoader;
@@ -45,19 +61,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXParseException;
-
-import javax.servlet.ServletContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Configuration object for urlrewrite filter.
@@ -73,6 +76,7 @@ public class Conf {
     private final List rules = new ArrayList(50);
     private final List catchElems = new ArrayList(10);
     private List outboundRules = new ArrayList(50);
+    private final Map<String, RewriteMap> rewriteMaps = new HashMap<String, RewriteMap>();
     private boolean ok = false;
     private Date loadedDate = null;
     private int ruleIdCounter = 0;
@@ -221,7 +225,7 @@ public class Conf {
      * <p/>
      * Note, protected so that is can be extended.
      */
-    protected void processConfDoc(Document doc) {
+    protected void processConfDoc(Document doc) throws IllegalArgumentException, IOException {
         Element rootElement = doc.getDocumentElement();
 
         if ("true".equalsIgnoreCase(getAttrValue(rootElement, "use-query-string"))) setUseQueryString(true);
@@ -237,6 +241,13 @@ public class Conf {
             Node node = rootElementList.item(i);
 
             if (node.getNodeType() == Node.ELEMENT_NODE &&
+                ((Element) node).getTagName().equals("RewriteMap")) {
+                Element mapNode = (Element) node;
+                String name = getAttrValue(mapNode, "name");
+                String type = getAttrValue(mapNode, "type");
+                String source = getAttrValue(mapNode, "source");
+                rewriteMaps.put(name, RewriteMapFactory.create(type, source));
+            } else if (node.getNodeType() == Node.ELEMENT_NODE &&
                     ((Element) node).getTagName().equals("rule")) {
                 Element ruleElement = (Element) node;
                 // we have a rule node
@@ -634,5 +645,9 @@ public class Conf {
 
     public boolean isDecodeUsingEncodingHeader() {
         return decodeUsingEncodingHeader;
+    }
+
+    public Map<String, RewriteMap> getRewriteMaps() {
+        return rewriteMaps;
     }
 }

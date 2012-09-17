@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import junit.framework.TestCase;
 
 import org.tuckey.web.filters.urlrewrite.RewriteMap;
+import org.tuckey.web.filters.urlrewrite.RewriteMapFactory;
 import org.tuckey.web.filters.urlrewrite.substitution.ChainedSubstitutionFilters;
 import org.tuckey.web.filters.urlrewrite.substitution.FunctionReplacer;
 import org.tuckey.web.filters.urlrewrite.substitution.SubstitutionContext;
@@ -146,4 +147,23 @@ public class FunctionReplacerTest extends TestCase {
             )
         );
     }
+
+    public void testRewriteMapFromPropertyFile() throws InvocationTargetException, IOException, ServletException {
+        final String subjectOfReplacement = "/${rewriteMap:testMap:property-a}";
+        Map<String, RewriteMap> rewriteMaps = new HashMap<String, RewriteMap>();
+        rewriteMaps.put("testMap", RewriteMapFactory.create("properties", "/org/tuckey/web/filters/urlrewrite/test-properties.properties"));
+
+        SubstitutionContext ctx = new SubstitutionContext(null, null, null, null, rewriteMaps);
+
+        assertTrue(FunctionReplacer.containsFunction(subjectOfReplacement));
+        assertEquals(
+              "/value-a:sdlkfjsl"
+            , new FunctionReplacer().substitute(
+                subjectOfReplacement, 
+                ctx, 
+                new ChainedSubstitutionFilters(Collections.EMPTY_LIST)
+            )
+        );
+    }
+
 }

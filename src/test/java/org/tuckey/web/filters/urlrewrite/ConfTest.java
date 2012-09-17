@@ -70,6 +70,12 @@ public class ConfTest extends TestCase {
         List outboundRules = conf.getOutboundRules();
         List catches = conf.getCatchElems();
 
+        // make sure property file loaded correctly
+        RewriteMap testMap = conf.getRewriteMaps().get("testMap");
+        assertNotNull(testMap);
+        assertEquals("value-a:sdlkfjsl", testMap.getValue("property-a"));
+        assertEquals("value-b:werwerw", testMap.getValue("property-b"));
+
         NormalRule rule = (NormalRule) rules.get(0);
         assertEquals("basicfrom1", rule.getFrom());
         assertEquals("basicto1", rule.getTo());

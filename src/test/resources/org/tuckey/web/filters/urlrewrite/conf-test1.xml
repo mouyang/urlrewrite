@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.2//EN"
-        "http://www.tuckey.org/res/dtds/urlrewrite3.2.dtd">
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
+        "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
 
 <urlrewrite decode-using="utf-8">
+
+    <RewriteMap name="testMap" type="properties" source="/org/tuckey/web/filters/urlrewrite/test-properties.properties" />
 
     <rule>
         <condition next="or" type="header" name="user-agent">basicvalue1</condition>
@@ -64,6 +66,12 @@
     <rule>
         <from>^/lowerMe/([A-Z])+/$</from>
         <to>/lowerMe/${lower:$1}</to>
+    </rule>
+
+    <rule>
+        <name>rewriteMap integration test</name>
+        <from>^/(property-a)$</from>
+        <to>/${rewriteMap:testMap:$1}</to>
     </rule>
 
     <outbound-rule>
