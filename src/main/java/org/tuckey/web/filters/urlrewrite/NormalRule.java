@@ -100,8 +100,8 @@ public class NormalRule extends RuleBase implements Rule {
             ruleExecutionOutput.setReplacedUrl(target + "&" + hsRequest.getQueryString());
         }
         if (isLast()) {
-            if (stripTrailingQuestionMarks) {
-                String target = ruleExecutionOutput.getReplacedUrl();
+            String target = ruleExecutionOutput.getReplacedUrl();
+            if (stripTrailingQuestionMarks && null != target) {
                 for (int index = target.length() - 1; index >= 0; index--) {
                     if ('?' != target.charAt(index)) {
                         if (index != target.length()) {
